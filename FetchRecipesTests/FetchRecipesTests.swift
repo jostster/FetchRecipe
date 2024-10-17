@@ -9,28 +9,26 @@ import XCTest
 @testable import FetchRecipes
 
 final class FetchRecipesTests: XCTestCase {
+    private var viewModel = RecipeViewModel()
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testFetchRecipes() async throws {
+        do {
+            try await viewModel.fetchRecipes()
+            XCTAssert(!viewModel.recipes.isEmpty)
+        } catch {
+            XCTFail("Fetch recipes failed")
         }
     }
-
+    
+    func testAsyncImageCachePass() async throws {
+        let image = await viewModel.loadImage(for: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b2879d3a-b145-4618-9c1d-fd3a451d0739/small.jpg")
+        let cachedImage = viewModel.imageCache.object(forKey: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b2879d3a-b145-4618-9c1d-fd3a451d0739/small.jpg")
+        XCTAssert(image == cachedImage)
+    }
+    
+    func testAsyncImageNotInCash() async throws {
+        let image = await viewModel.loadImage(for: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b2879d3a-b145-4618-9c1d-fd3a451d0739/small.jpg")
+        let cachedImage = viewModel.imageCache.object(forKey: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/def8c76f-9054-40ff-8021-7f39148ad4b7/small.jpg")
+        XCTAssert(image != cachedImage)
+    }
 }
