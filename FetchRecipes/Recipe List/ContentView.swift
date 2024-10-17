@@ -22,6 +22,7 @@ struct RecipeListView: View {
                     LazyVStack(alignment: .leading) {
                         ForEach(viewModel.recipes, id: \.id) { recipe in
                             recipeItem(recipe)
+                            Divider()
                         }
                     }
                 }
